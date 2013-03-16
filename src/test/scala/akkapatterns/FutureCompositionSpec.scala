@@ -1,12 +1,13 @@
 package akkapatterns
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global;
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.dispatch.ExecutionContexts
 import java.util.concurrent.Executors
 import scala.concurrent.Await
 import org.scalatest.FunSuite
+import basic.MovioSpec
 
 /** @see http://doc.akka.io/docs/akka/snapshot/scala/futures.html */
 class FutureCompositionSpec extends MovioSpec {

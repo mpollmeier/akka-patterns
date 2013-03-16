@@ -10,6 +10,7 @@ import akka.actor.ActorRef
 import akka.actor.Actor
 import org.slf4j.Logger
 import akka.actor.PoisonPill
+import basic.AkkaSpec
 
 class WorkPullingPatternSpec extends AkkaSpec {
   val logger = mock[Logger]

@@ -1,7 +1,7 @@
-package akkapatterns
+package basic
 
 import scala.concurrent.duration._
-import org.scalatest.{ Suite, BeforeAndAfter, BeforeAndAfterAll, FunSpec }
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSpec}
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.mock.MockitoSugar
 import akka.actor.{ Actor, ActorSystem, Props, DeadLetter }
