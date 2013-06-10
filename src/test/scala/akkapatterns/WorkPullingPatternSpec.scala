@@ -11,6 +11,8 @@ import akka.actor.Actor
 import org.slf4j.Logger
 import akka.actor.PoisonPill
 import basic.AkkaSpec
+import scala.concurrent.Future
+import scala.concurrent.Promise
 
 class WorkPullingPatternSpec extends AkkaSpec {
   val logger = mock[Logger]
@@ -26,7 +28,7 @@ class WorkPullingPatternSpec extends AkkaSpec {
   }
 
   def newWorker[T](master: ActorRef): ActorRef = TestActorRef[Worker[T]](Props(new Worker[T](master) {
-    def doWork(work: T) {}
+    def doWork(work: T): Future[_] = Future {}
   }))
 
   describe("Master") {
@@ -89,11 +91,10 @@ class WorkPullingPatternSpec extends AkkaSpec {
       val worker = TestProbe()
       master ! RegisterWorker(worker.ref)
       master.underlyingActor.workers.size should be(1)
-    
+
       worker.ref ! PoisonPill
       master.underlyingActor.workers.size should be(0)
     }
-
 
   }
 
@@ -129,9 +130,8 @@ class WorkPullingPatternSpec extends AkkaSpec {
       var executedWork: String = null
 
       val worker = TestActorRef[Worker[String]](Props(new Worker[String](master) {
-        def doWork(work: String) {
-          executedWork = work
-        }
+        def doWork(work: String): Future[_] =
+          Future { executedWork = work }
       }))
 
       worker ! Work("some work")

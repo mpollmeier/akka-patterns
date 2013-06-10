@@ -8,6 +8,7 @@ import scala.collection.IterableLike
 import scala.reflect.ClassTag
 import org.slf4j.LoggerFactory
 import akka.actor.Terminated
+import scala.concurrent.Future
 
 object WorkPullingPattern {
   sealed trait Message
@@ -60,6 +61,7 @@ class Master[T] extends Actor {
 }
 
 abstract class Worker[T](val master: ActorRef) extends Actor {
+  implicit val ec = context.dispatcher
 
   override def preStart {
     master ! RegisterWorker(self)
@@ -72,9 +74,8 @@ abstract class Worker[T](val master: ActorRef) extends Actor {
     case Work(work: T) ⇒
       // haven't found a nice way to get rid of that warning
       // looks like we can't suppress the erasure warning: http://stackoverflow.com/questions/3506370/is-there-an-equivalent-to-suppresswarnings-in-scala
-      doWork(work)
-      master ! GimmeWork
+      doWork(work) onComplete { case _ ⇒ master ! GimmeWork }
   }
 
-  def doWork(work: T)
+  def doWork(work: T): Future[_]
 }

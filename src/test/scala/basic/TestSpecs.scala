@@ -1,7 +1,8 @@
 package basic
 
 import scala.concurrent.duration._
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSpec}
+import scala.collection.mutable
+import org.scalatest.{ BeforeAndAfter, BeforeAndAfterAll, FunSpec }
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.mock.MockitoSugar
 import akka.actor.{ Actor, ActorSystem, Props, DeadLetter }
@@ -24,8 +25,8 @@ trait MovioSpec extends FunSpec
   with BeforeAndAfterAll
 
 abstract class AkkaSpec extends TestKit(ActorSystem("AkkaTestSystem"))
-  with ImplicitSender
-  with MovioSpec {
+    with ImplicitSender
+    with MovioSpec {
   val log = LoggerFactory.getLogger(getClass)
   override def afterAll() { system.shutdown() }
   implicit val timeout = Timeout(10 seconds)
@@ -40,6 +41,20 @@ abstract class AkkaSpec extends TestKit(ActorSystem("AkkaTestSystem"))
   }))
   system.eventStream.subscribe(listener, classOf[DeadLetter])
   system.eventStream.subscribe(listener, classOf[UnhandledMessage])
+
+  def expectMsgAllOfIgnoreOthers[T](max: Duration, expected: T*) {
+    val outstanding = mutable.Set(expected: _*)
+    fishForMessage(max) {
+      case msg: T if outstanding.contains(msg) ⇒
+        outstanding.remove(msg)
+        outstanding.isEmpty
+      case _ ⇒ false
+    }
+  }
+
+  def expectMsgAllOfIgnoreOthers[T](expected: T*) {
+    expectMsgAllOfIgnoreOthers(3 seconds, expected: _*)
+  }
 
   def time(func: ⇒ Unit): Duration = {
     val start = System.currentTimeMillis
