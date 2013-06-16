@@ -1,0 +1,7 @@
+add extract from example spec to readme
+replace thread.sleep with: let master notify the originator of the epic
+let worker look up master by name
+change iterable to iterator or stream
+  make sure it garbage collects the read items
+workers: handle case where actor is not available
+use state: context.become(Busy) so that it doesn't spawn lots of futures
