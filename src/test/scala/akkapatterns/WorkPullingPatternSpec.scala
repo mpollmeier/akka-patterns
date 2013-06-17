@@ -13,6 +13,7 @@ import akka.actor.PoisonPill
 import basic.AkkaSpec
 import scala.concurrent.Future
 import scala.concurrent.Promise
+import scala.reflect.ClassTag
 
 class WorkPullingPatternSpec extends AkkaSpec {
   val logger = mock[Logger]
@@ -27,8 +28,10 @@ class WorkPullingPatternSpec extends AkkaSpec {
     master
   }
 
-  def newWorker[T](master: ActorRef): ActorRef = TestActorRef[Worker[T]](Props(new Worker[T](master) {
-    def doWork(work: T): Future[_] = Future {}
+  def newWorker(master: ActorRef): ActorRef = TestActorRef[Worker[String]](Props(new Worker[String](master) {
+    def doWork(work: String): Future[_] = Future {
+      println(s"working really hard for: [$work]")
+    }
   }))
 
   describe("Master") {

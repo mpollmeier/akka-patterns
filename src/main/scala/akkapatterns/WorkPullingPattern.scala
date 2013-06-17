@@ -60,7 +60,7 @@ class Master[T] extends Actor {
   }
 }
 
-abstract class Worker[T](val master: ActorRef) extends Actor {
+abstract class Worker[T: ClassTag](val master: ActorRef) extends Actor {
   implicit val ec = context.dispatcher
 
   override def preStart {
